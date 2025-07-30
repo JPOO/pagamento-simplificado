@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use Illuminate\Contracts\View\View;
 
 class AuthController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Returns view of dashboard or login
+     *
+     * @return View
      */
-    public function index()
+    public function index(): View
     {
         if (Auth::user()) {
             return redirect('dashboard');
@@ -20,7 +23,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Display a listing of the resource.
+     * Validate login with email and password and start session
      */
     public function login(Request $request)
     {
@@ -38,6 +41,9 @@ class AuthController extends Controller
         }
     }
 
+    /**
+     * Finish session and redirect to login
+     */
     public function logout(Request $request)
     {
         Auth::logout();
