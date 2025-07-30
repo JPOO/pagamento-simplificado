@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('wallets', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->nullable()->index();
-            $table->integer('amount');
+            $table->float('amount', 8, 2);
             $table->timestamps();
         });
     }
