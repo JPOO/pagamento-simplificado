@@ -1,4 +1,4 @@
-### Pagamento simplificado
+# Pagamento simplificado
 
 Projeto de Pagamento simplicado desenvolvido como teste técnico para a empresa IXC Software.
 
@@ -38,3 +38,22 @@ Acessar aplicação pela URL local
 ```
  http://localhost:8000
 ```
+
+## Validações
+
+### Validações de usuários
+
+- Cadastro de usuários de diferentes n;';iveis;
+- Validação de usuário e unicidade por cpf-cpnj e e-mail;
+- Autenticação de usuário com validação de senha;
+
+### Validações de transação e carteira
+
+- Verifica se usuário que realiza a transferência é tipo Comum;
+- Verifica se o usuário que recebe a trasnferência é valido (não posso enviar para mim mesmo);
+- Verifica valor minimo a ser transferido (não faz sentido enviar R$ 0,00);
+- Verifica se usuário que realiza a transferência tem o dinheiro necessário proposto;
+- Verifica se o usuário que recebe transferência é válido;
+- Verifica se a transação está autorizada pelo serviço externo;
+- Atualiza os valores nas carteiras conforme transferência.
+- Envia e-mail para o usuário que recebe a transferência em caso de sucesso;
