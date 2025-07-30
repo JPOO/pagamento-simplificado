@@ -5,19 +5,25 @@ namespace App\Services;
 use App\Helpers\Number;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Service for execute transfer
+ *
+ * @package Services
+ * @author João Paulo Oliveira da Silva<joao.oliveira@unochapeco.edu.br>
+ */
 class TransferService
 {
     private string $cpfcnpj;
 
-    private float $value_transfer;
+    private float $value;
 
     public function __construct(array $validated)
     {
         $this->cpfcnpj = $validated['cpfcnpj'];
-        $this->value_transfer = Number::normalizeStringToNumber($validated['value']);
+        $this->value = Number::normalizeStringToNumber($validated['value']);
     }
 
-    public function sendTransfer(): array
+    public function executeTransfer(): array
     {
         $validated = $this->getValidation();
 
@@ -39,7 +45,7 @@ class TransferService
 
     private function processTransfer()
     {
-        $sendTransfer = SendTransferService::sendTransfer($this->value_transfer);
+        $sendTransfer = SendTransferService::sendTransfer($this->value);
 
         if (!$sendTransfer) {
             return [
@@ -50,7 +56,7 @@ class TransferService
 
         $receiveTransfer = ReceiveTransferService::receiveTransfer(
             $this->cpfcnpj,
-            $this->value_transfer
+            $this->value
         );
 
         if (!$receiveTransfer) {
@@ -62,7 +68,7 @@ class TransferService
     }
 
     /*
-     * Get validations
+     * Get all validation
      *
      * @return array
      */
@@ -89,7 +95,7 @@ class TransferService
             ];
         }
 
-        if (!$this->verifyUserHasEnoghtMoney()) {
+        if (!$this->verifyUserHasEnoghtAmount()) {
             return [
                 'success' => false,
                 'message' => 'Você não possui saldo suficiente para a transferência.'
@@ -100,6 +106,13 @@ class TransferService
             return [
                 'success' => false,
                 'message' => 'Usuário com o CPF/CNPJ não encontrado.'
+            ];
+        }
+
+        if (!$this->verifyExternalTransferAuthorization()) {
+            return [
+                'success' => false,
+                'message' => 'Transferência não autorizada pelo serviço externo autorizador.'
             ];
         }
 
@@ -115,7 +128,7 @@ class TransferService
      */
     private function verifyMinimumValueToTransfer(): bool
     {
-        if (empty($this->value_transfer) || (is_numeric($this->value_transfer) && (float) $this->value_transfer == 0)) {
+        if (empty($this->value) || (is_numeric($this->value) && (float) $this->value == 0)) {
             return false;
         }
 
@@ -161,11 +174,11 @@ class TransferService
      *
      * @return bool
      */
-    private function verifyUserHasEnoghtMoney(): bool
+    private function verifyUserHasEnoghtAmount(): bool
     {
         $wallet_amount = WalletService::getAmount();
 
-        if ($this->value_transfer > $wallet_amount) {
+        if ($this->value > $wallet_amount) {
             return false;
         }
 
@@ -173,7 +186,7 @@ class TransferService
     }
 
     /*
-     * Verify if user exist
+     * Verify if user is valid
      *
      * @return bool
      */
@@ -186,5 +199,29 @@ class TransferService
         }
 
         return true;
+    }
+
+    /*
+     * Verify if transfer has external authorization
+     *
+     * @return bool
+     */
+    private function verifyExternalTransferAuthorization()
+    {
+        $externalTransfer = ExternalTransferAuthorizationService::hasAuthorization(
+            [
+                'cpfcnpj' => Auth::user()->cpfcnpj
+            ], [
+                'cpfcnpj' => $this->cpfcnpj
+            ],
+            $this->value
+        );
+
+        return $externalTransfer;
+    }
+
+    private function sedEmail()
+    {
+
     }
 }

@@ -40,7 +40,7 @@ class TransferController extends Controller
         ]);
 
         $transferService = new TransferService($validated);
-        $sendTransfer = $transferService->sendTransfer();
+        $sendTransfer = $transferService->executeTransfer();
 
         $transferMessageStatus = $sendTransfer['success'] ? 'success-status' : 'error-status';
 
