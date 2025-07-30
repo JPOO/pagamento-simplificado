@@ -2,14 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\{
+    RedirectResponse,
+    Request
+};
 
+/**
+ * Controller for authentication
+ *
+ * @package Controllers
+ * @author João Paulo Oliveira da Silva<joao.oliveira@unochapeco.edu.br>
+ */
 class AuthController extends Controller
 {
     /**
-     * Returns view of dashboard or login
+     * Return view of dashboard or login
      *
      * @return View
      */
@@ -23,9 +32,11 @@ class AuthController extends Controller
     }
 
     /**
-     * Validate login with email and password and start session
+     * Validate login with email and password, start session and redirect to dashboard
+     *
+     * @return RedirectResponse
      */
-    public function login(Request $request)
+    public function login(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'email' => 'required|email|string',
@@ -43,8 +54,10 @@ class AuthController extends Controller
 
     /**
      * Finish session and redirect to login
+     *
+     * @return RedirectResponse
      */
-    public function logout(Request $request)
+    public function logout(Request $request): RedirectResponse
     {
         Auth::logout();
 

@@ -2,23 +2,37 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Contracts\View\View;
 use App\Services\TransferService;
-use Illuminate\Http\Request;
+use Illuminate\Http\{
+    RedirectResponse,
+    Request
+};
 
+/**
+ * Controller for transference
+ *
+ * @package Controllers
+ * @author João Paulo Oliveira da Silva<joao.oliveira@unochapeco.edu.br>
+ */
 class TransferController extends Controller
 {
     /**
-     * Show the form for creating a new resource.
+     * Return view of new transference
+     *
+     * @return View
      */
-    public function create()
+    public function create(): View
     {
         return view('new-transfer');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Validate transference with cpf-cnpj and value and return message status
+     *
+     * @return RedirectResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'cpfcnpj' => 'required|string',
@@ -26,7 +40,6 @@ class TransferController extends Controller
         ]);
 
         $transferService = new TransferService($validated);
-
         $sendTransfer = $transferService->sendTransfer();
 
         $transferMessageStatus = $sendTransfer['success'] ? 'success-status' : 'error-status';

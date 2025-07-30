@@ -8,7 +8,8 @@ use Illuminate\Support\Facades\Auth;
 class TransferService
 {
     private string $cpfcnpj;
-    private int $value_transfer;
+
+    private float $value_transfer;
 
     public function __construct(array $validated)
     {
@@ -60,7 +61,12 @@ class TransferService
         }
     }
 
-    private function getValidation()
+    /*
+     * Get validations
+     *
+     * @return array
+     */
+    private function getValidation(): array
     {
         if (!$this->verifyUserHasAuthorizedToTransfer()) {
             return [
@@ -69,7 +75,7 @@ class TransferService
             ];
         }
 
-        if (!$this->verifyUnathorizedUser()) {
+        if (!$this->verifyUserHasAuthorizedToReceive()) {
             return [
                 'success' => false,
                 'message' => 'Você não pode transferir para este usuário.'
@@ -103,13 +109,13 @@ class TransferService
     }
 
     /*
-     * Verify if user can transfer to another user
+     * Verify if value send is bigger than 0
      *
      * @return bool
      */
     private function verifyMinimumValueToTransfer(): bool
     {
-        if ($this->value_transfer == 0) {
+        if (empty($this->value_transfer) || (is_numeric($this->value_transfer) && (float) $this->value_transfer == 0)) {
             return false;
         }
 
@@ -132,7 +138,12 @@ class TransferService
         return false;
     }
 
-    private function verifyUnathorizedUser(): bool
+    /*
+     * Verify user is unauthorized
+     *
+     * @return bool
+     */
+    private function verifyUserHasAuthorizedToReceive(): bool
     {
         $unautherized = [
             Auth::user()->cpfcnpj
@@ -145,6 +156,11 @@ class TransferService
         return true;
     }
 
+    /*
+     * Verify if user has enoght money
+     *
+     * @return bool
+     */
     private function verifyUserHasEnoghtMoney(): bool
     {
         $wallet_amount = WalletService::getAmount();
@@ -156,11 +172,16 @@ class TransferService
         return true;
     }
 
+    /*
+     * Verify if user exist
+     *
+     * @return bool
+     */
     private function verifyUserReceiveExist()
     {
         $user = UserService::getUserByCpfCnpj($this->cpfcnpj);
 
-        if (!$user) {
+        if ($user->isEmpty()) {
             return false;
         }
 

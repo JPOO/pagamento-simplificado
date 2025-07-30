@@ -4,14 +4,21 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * Service for password hash
+ *
+ * @package Services
+ * @author João Paulo Oliveira da Silva<joao.oliveira@unochapeco.edu.br>
+ */
 class PasswordService
 {
-    private string $password;
-
-    public function hashPassword(string $password)
+    /**
+     * Encrypt password
+     *
+     * @return Hash
+     */
+    public function getHashPassword(string $password): string
     {
-        $this->password = $password;
-
-        return Hash::make($this->password);
+        return Hash::make($password);
     }
 }

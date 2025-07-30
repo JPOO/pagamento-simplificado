@@ -8,13 +8,22 @@ use http\Client\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Service for user
+ *
+ * @package Services
+ * @author João Paulo Oliveira da Silva<joao.oliveira@unochapeco.edu.br>
+ */
 class UserService
 {
+    /*
+     * Return user by cpf-cnpj
+     *
+     * @return bool
+     */
     public static function getUserByCpfCnpj(string $cpfcnpj)
     {
-        $user = UserRepository::getUserByCpfCnpj($cpfcnpj);
-
-        return $user;
+        return UserRepository::getByCpfCnpj($cpfcnpj);
     }
 
     /*

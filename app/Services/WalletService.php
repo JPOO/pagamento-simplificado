@@ -4,19 +4,25 @@ namespace App\Services;
 
 use App\Repositories\WalletRepository;
 
+/**
+ * Service for wallet
+ *
+ * @package Services
+ * @author João Paulo Oliveira da Silva<joao.oliveira@unochapeco.edu.br>
+ */
 class WalletService
 {
     /*
      * Return amount of user wallet
      */
-    public static function getAmount(): int
+    public static function getAmount(): float
     {
-        $repositoryWallet = WalletRepository::getByUserSession()->toArray();
+        $repositoryWallet = WalletRepository::getByUserSession();
 
-        if (empty($repositoryWallet)) {
-            $amount = 0;
+        if ($repositoryWallet->isEmpty()) {
+            $amount = 0.00;
         } else {
-            $amount = $repositoryWallet['amount'];
+            $amount = $repositoryWallet->amount;
         }
 
         return $amount;

@@ -6,22 +6,30 @@ use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
+/**
+ * Repository for user
+ *
+ * @package Repositories
+ * @author João Paulo Oliveira da Silva<joao.oliveira@unochapeco.edu.br>
+ */
 class UserRepository
 {
-    public static function createUser(User $user, array $validated)
+    /**
+     * Save data in user table
+     */
+    public static function save(User $user, array $validated)
     {
         $user = $user->fill($validated);
 
         return $user->save();
     }
 
-    public static function getUserByCpfCnpj(string $cpfcnpj)
+    /**
+     * Get user by cpf-cnpj
+     */
+    public static function getByCpfCnpj(string $cpfcnpj)
     {
-        return User::where('cpfcnpj', $cpfcnpj)->get();
-    }
-
-    public static function get()
-    {
-        return User::find(Auth::user()->id)->get();
+        return User::where('cpfcnpj', $cpfcnpj)
+            ->get();
     }
 }
