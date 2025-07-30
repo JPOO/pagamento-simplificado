@@ -45,7 +45,10 @@ class TransferService
 
     private function processTransfer()
     {
-        $sendTransfer = SendTransferService::sendTransfer($this->value);
+        $sendTransfer = (new ProcessTransferSendService)->execute(
+            Auth::user()->cpfcnpj,
+            $this->value
+        );
 
         if (!$sendTransfer) {
             return [
@@ -54,7 +57,7 @@ class TransferService
             ];
         }
 
-        $receiveTransfer = ReceiveTransferService::receiveTransfer(
+        $receiveTransfer = (new ProcessTransferReceiveService)->execute(
             $this->cpfcnpj,
             $this->value
         );
