@@ -223,8 +223,11 @@ class TransferService
         return $externalTransfer;
     }
 
-    private function sedEmail()
+    private function sedEmailToTransferReceive()
     {
-
+        MailService::send([
+            'to' => '',
+            'body' => 'Você recebeu R$ ' . $this->value . ' de ' . Auth::user()->nome
+        ]);
     }
 }

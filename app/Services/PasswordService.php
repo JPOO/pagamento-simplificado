@@ -17,7 +17,7 @@ class PasswordService
      *
      * @return Hash
      */
-    public function getHashPassword(string $password): string
+    public function getEncryptPassword(string $password): string
     {
         return Hash::make($password);
     }

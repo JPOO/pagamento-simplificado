@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
+use App\Models\{
+    User,
+    Wallet
+};
 use App\Services\PasswordService;
 use Illuminate\Http\{
     RedirectResponse,
@@ -31,7 +34,7 @@ class UserController extends Controller
      *
      * @return RedirectResponse
      */
-    public function store(Request $request, User $user, PasswordService $passwordService): RedirectResponse
+    public function store(Request $request, User $user, Wallet $wallet, PasswordService $passwordService): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|min:2|max:200|string',
@@ -43,9 +46,17 @@ class UserController extends Controller
 
         try {
             $user = $user->fill($validated);
-            $user->password = $passwordService->getHashPassword($validated['password']);
+            $user->password = $passwordService->getEncryptPassword($validated['password']);
 
             $user->save();
+
+            //Create a wallet with initial amount
+            $wallet = $wallet->fill([
+                'user_id' => $user->id,
+                'amount' => 1000.00
+            ]);
+
+            $wallet->save();
 
             return back()->with('success-status', 'Nova conta criada com sucesso!');
         } catch (\Exception $e) {
