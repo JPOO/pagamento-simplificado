@@ -16,18 +16,21 @@ class UserRepository
 {
     /**
      * Save data in user table
+     *
+     * @return User
      */
-    public static function save(User $user, array $validated)
+    public function save(array $data): User
     {
-        $user = $user->fill($validated);
+        $user = (new User())->fill($data);
+        $user->save();
 
-        return $user->save();
+        return $user;
     }
 
     /**
      * Get user by cpf-cnpj
      */
-    public static function getByCpfCnpj(string $cpfcnpj)
+    public function getByCpfCnpj(string $cpfcnpj)
     {
         return User::where('cpfcnpj', $cpfcnpj)
             ->get();

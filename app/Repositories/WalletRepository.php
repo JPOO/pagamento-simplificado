@@ -15,29 +15,42 @@ use Illuminate\Support\Facades\Auth;
 class WalletRepository
 {
     /**
+     * Save data in wallet table
+     *
+     * @return Wallet
+     */
+    public function save(array $data): Wallet
+    {
+        $wallet = (new Wallet())->fill($data);
+        $wallet->save();
+
+        return $wallet;
+    }
+
+    /**
      * Get wallet by user session
      */
-    public static function getByUserSession()
+    public function getByUserSession()
     {
         return Wallet::where('user_id', Auth::user()->id)
             ->get();
     }
 
     /**
-     * Update data in wallet table
+     * Get data in wallet table by cpfcnpj
      */
-    public static function update(int $userId, array $data)
-    {
-        return Wallet::where('user_id', $userId)
-            ->update($data);
-    }
-
-    /**
-     * Get data in wallet table
-     */
-    public static function get(int $userId)
+    public function getByUserId(string $userId)
     {
         return Wallet::where('user_id', $userId)
             ->get();
+    }
+
+    /**
+     * Update data in wallet table
+     */
+    public function update(int $userId, array $data)
+    {
+        return Wallet::where('user_id', $userId)
+            ->update($data);
     }
 }
