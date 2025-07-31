@@ -7,6 +7,7 @@ use App\Http\Controllers\{
     DashboardController,
     TransferController
 };
+use App\Http\Middleware\CheckUserRole;
 
 Route::get(
     '/new-user',
@@ -38,14 +39,16 @@ Route::middleware(['auth'])->group(function() {
         '/dashboard',
         [DashboardController::class, 'index']
     )->name('dashboard');
+
+    Route::middleware([CheckUserRole::class])->group(function() {
+        Route::get(
+            '/new-transfer',
+            [TransferController::class, 'create']
+        )->name('new-transfer');
+
+        Route::post(
+            '/new-transfer',
+            [TransferController::class, 'store']
+        )->name('add-transfer');
+    });
 });
-
-Route::get(
-    '/new-transfer',
-    [TransferController::class, 'create']
-)->name('new-transfer');
-
-Route::post(
-    '/new-transfer',
-    [TransferController::class, 'store']
-)->name('add-transfer');
