@@ -53,12 +53,12 @@
                         <div class="form-group row">
                             <div class="col">
                                 <label class="">Tipo de usuário <span class="required"></span></label>
-                                <select class="custom-select" name="type">
+                                <select class="custom-select" name="role">
                                     <option value="">Selecion o tipo de usuário</option>
                                     <option value="1">Comum</option>
                                     <option value="2">Lojista</option>
                                 </select>
-                                @error('type')
+                                @error('role')
                                     <div class="alert alert-danger mt-2 mb-0 p-1">{{ $message }}</div>
                                 @enderror
                             </div>

@@ -66,11 +66,13 @@
                                     Dashboard
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-primary" href="new-transfer">
-                                    Nova transferência
-                                </a>
-                            </li>
+                            @if (auth()->user()->role == \App\Models\User::COMMON_USER)
+                                <li class="nav-item">
+                                    <a class="nav-link text-primary" href="new-transfer">
+                                        Nova transferência
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
 
                         <ul class="navbar-nav ml-auto">
