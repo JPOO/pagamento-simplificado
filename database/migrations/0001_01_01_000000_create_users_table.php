@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('email', 200)->unique();
             $table->string('cpfcnpj', 100)->unique();
             $table->string('password');
-            $table->integer('type');
+            $table->integer('role');
 
             $table->rememberToken(); // For "remember me" functionality
             $table->timestamps(); // created_at and updated_at columns
