@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Transfer;
 
 use App\Apis\ExternalTransferAuthorizationApi;
 use App\Helpers\Number;
@@ -18,7 +18,7 @@ class ExternalTransferAuthorizationService
      *
      * @return bool
      */
-    public static function hasAuthorization(
+    public function hasAuthorization(
         array $DataTransferSend,
         array $DataTransferReceive,
         float $value
@@ -27,6 +27,10 @@ class ExternalTransferAuthorizationService
         $listAuthorization = $transferAuthorization->get();
 
         foreach ($listAuthorization as $auth) {
+            if (!isset($auth['origin']) || !isset($auth['destination'])) {
+                continue;
+            }
+
             $origin = $auth['origin'];
             $destination = $auth['destination'];
 
