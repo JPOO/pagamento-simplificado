@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Wallet\WalletService;
 use Illuminate\Contracts\View\View;
-use Illuminate\Http\Request;
 
 /**
  * Controller for dashboard
@@ -20,6 +20,9 @@ class DashboardController extends Controller
      */
     public function index(): View
     {
-        return view('dashboard');
+        $amount = (new WalletService())->getAmount();
+
+        return view('dashboard')
+            ->with('amount', $amount);
     }
 }

@@ -2,16 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\{
-    User,
-    Wallet
-};
-use App\Services\PasswordService;
-use Illuminate\Http\{
-    RedirectResponse,
-    Request
-};
-use Illuminate\Validation\ValidationException;
+use App\Services\User\UserService;
+use Illuminate\Http\{RedirectResponse, Request};
 
 /**
  * Controller for user
@@ -34,34 +26,24 @@ class UserController extends Controller
      *
      * @return RedirectResponse
      */
-    public function store(Request $request, User $user, Wallet $wallet, PasswordService $passwordService): RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'name' => 'required|min:2|max:200|string',
             'email' => 'required|email|string|unique:users',
             'cpfcnpj' => 'required|string|unique:users',
             'password' => 'required|min:8|max:200|string',
-            'type' => 'required|min:1|max:1',
+            'role' => 'required|min:1|max:1',
         ]);
 
-        try {
-            $user = $user->fill($validated);
-            $user->password = $passwordService->getEncryptPassword($validated['password']);
+        $userService = new UserService();
+        $insertUser = $userService->insertUser($validated);
 
-            $user->save();
+        $insertMessageStatus = $insertUser['success'] ? 'success-status' : 'error-status';
 
-            //Create a wallet with initial amount
-            $wallet = $wallet->fill([
-                'user_id' => $user->id,
-                'amount' => 1000.00
-            ]);
-
-            $wallet->save();
-
-            return back()->with('success-status', 'Nova conta criada com sucesso!');
-        } catch (\Exception $e) {
-
-            return back()->with('error-status', 'Ocorreu um erro ao criar nova conta.');
-        }
+        return back()->withInput()->with(
+            $insertMessageStatus,
+            $insertUser['message']
+        );
     }
 }
