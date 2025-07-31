@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 class User extends Authenticatable
 {
     const COMMON_USER   = 1,
-        SHOPKEEPER_USER = 2;
+        SHOPKEEPER     = 2;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -24,7 +24,7 @@ class User extends Authenticatable
         'email',
         'cpfcnpj',
         'password',
-        'type'
+        'role'
     ];
 
     /**
