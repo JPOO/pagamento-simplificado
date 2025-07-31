@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\Transfer\TransferService;
 use Illuminate\Contracts\View\View;
-use App\Services\TransferService;
-use Illuminate\Http\{
-    RedirectResponse,
-    Request
-};
+use Illuminate\Http\{RedirectResponse, Request};
 
 /**
  * Controller for transference
@@ -40,7 +37,7 @@ class TransferController extends Controller
         ]);
 
         $transferService = new TransferService($validated);
-        $sendTransfer = $transferService->executeTransfer();
+        $sendTransfer = $transferService->execute();
 
         $transferMessageStatus = $sendTransfer['success'] ? 'success-status' : 'error-status';
 

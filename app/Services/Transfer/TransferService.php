@@ -1,12 +1,16 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Transfer;
 
 use App\Helpers\Number;
+use App\Repositories\TransferRepository;
+use App\Services\MailService;
+use App\Services\User\UserService;
+use App\Services\Wallet\WalletService;
 use Illuminate\Support\Facades\Auth;
 
 /**
- * Service for execute transfer
+ * Service for external transfer authorization
  *
  * @package Services
  * @author João Paulo Oliveira da Silva<joao.oliveira@unochapeco.edu.br>
@@ -23,7 +27,12 @@ class TransferService
         $this->value = Number::normalizeStringToNumber($validated['value']);
     }
 
-    public function executeTransfer(): array
+    /**
+     * Execute transfer
+     *
+     * @return array
+     */
+    public function execute(): array
     {
         $validated = $this->getValidation();
 
@@ -31,11 +40,19 @@ class TransferService
             return $validated;
         }
 
-        $processed = $this->processTransfer();
+        $processed = (new TransferProcessService())
+            ->execute($this->cpfcnpj, $this->value);
 
         if (!$processed['success']) {
             return $processed;
         }
+
+        $this->insertTransfer(
+            $this->cpfcnpj,
+            $this->value
+        );
+
+        $this->sendEmailToUserReceive();
 
         return [
             'success' => true,
@@ -43,34 +60,7 @@ class TransferService
         ];
     }
 
-    private function processTransfer()
-    {
-        $sendTransfer = (new ProcessTransferSendService)->execute(
-            Auth::user()->cpfcnpj,
-            $this->value
-        );
-
-        if (!$sendTransfer) {
-            return [
-                'success' => true,
-                'message' => 'Ocorreu um erro durante a transferência. Nenhum valor foi enviado.'
-            ];
-        }
-
-        $receiveTransfer = (new ProcessTransferReceiveService)->execute(
-            $this->cpfcnpj,
-            $this->value
-        );
-
-        if (!$receiveTransfer) {
-            return [
-                'success' => false,
-                'message' => 'Ocorreu um erro durante a transferência. O valor será retornado.'
-            ];
-        }
-    }
-
-    /*
+    /**
      * Get all validation
      *
      * @return array
@@ -94,7 +84,7 @@ class TransferService
         if (!$this->verifyMinimumValueToTransfer()) {
             return [
                 'success' => false,
-                'message' => 'Você deve informar um valor maior que 0.'
+                'message' => 'Você deve informar um valor maior que R$ 0,00.'
             ];
         }
 
@@ -124,7 +114,7 @@ class TransferService
         ];
     }
 
-    /*
+    /**
      * Verify if value send is bigger than 0
      *
      * @return bool
@@ -138,7 +128,7 @@ class TransferService
         return true;
     }
 
-    /*
+    /**
      * Verify if user can transfer to another user
      *
      * @return bool
@@ -154,7 +144,7 @@ class TransferService
         return false;
     }
 
-    /*
+    /**
      * Verify user is unauthorized
      *
      * @return bool
@@ -172,14 +162,14 @@ class TransferService
         return true;
     }
 
-    /*
+    /**
      * Verify if user has enoght money
      *
      * @return bool
      */
     private function verifyUserHasEnoghtAmount(): bool
     {
-        $wallet_amount = WalletService::getAmount();
+        $wallet_amount = (new WalletService())->getAmount();
 
         if ($this->value > $wallet_amount) {
             return false;
@@ -188,46 +178,71 @@ class TransferService
         return true;
     }
 
-    /*
+    /**
      * Verify if user is valid
      *
      * @return bool
      */
     private function verifyUserReceiveExist()
     {
-        $user = UserService::getUserByCpfCnpj($this->cpfcnpj);
+        $user = (new UserService())->getUserByCpfCnpj($this->cpfcnpj);
 
-        if ($user->isEmpty()) {
+        if (empty($user)) {
             return false;
         }
 
         return true;
     }
 
-    /*
+    /**
      * Verify if transfer has external authorization
      *
      * @return bool
      */
     private function verifyExternalTransferAuthorization()
     {
-        $externalTransfer = ExternalTransferAuthorizationService::hasAuthorization(
+        $externalTransfer = (new ExternalTransferAuthorizationService())->hasAuthorization(
             [
                 'cpfcnpj' => Auth::user()->cpfcnpj
             ], [
-                'cpfcnpj' => $this->cpfcnpj
-            ],
+            'cpfcnpj' => $this->cpfcnpj
+        ],
             $this->value
         );
 
         return $externalTransfer;
     }
 
-    private function sedEmailToTransferReceive()
+    /**
+    * Insert transfer
+    *
+    * @return array
+    */
+    private function insertTransfer(string $cpfcnpj, float $value): void
     {
-        MailService::send([
-            'to' => '',
-            'body' => 'Você recebeu R$ ' . $this->value . ' de ' . Auth::user()->nome
+        $user = (new UserService())->getUserByCpfCnpj($cpfcnpj);
+
+        (new TransferRepository())->save([
+            'user_id_send' => Auth::user()->id,
+            'user_id_receive' => $user->id,
+            'value' => $value
+        ]);
+    }
+
+    /**
+    * Simulate email to send
+    *
+    * @return bool
+    */
+    private function sendEmailToUserReceive(): void
+    {
+        $user = (new UserService())->getUserByCpfCnpj($this->cpfcnpj);
+
+        (new MailService())->send([
+            'to' => $user->email,
+            'name' => $user->name,
+            'subject' => 'Nova transferência recebida',
+            'message' => 'Você recebeu uma transferência de R$ ' . $this->value . ' de ' . Auth::user()->nome
         ]);
     }
 }

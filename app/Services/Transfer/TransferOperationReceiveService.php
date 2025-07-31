@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Transfer;
 
 /**
  * Service for receive transference
@@ -8,12 +8,12 @@ namespace App\Services;
  * @package Services
  * @author João Paulo Oliveira da Silva<joao.oliveira@unochapeco.edu.br>
  */
-class ProcessTransferReceiveService extends ProcessTransferAbstract
+class TransferOperationReceiveService extends TransferOperationAbstract
 {
     /**
      * Calculate receive value (adds value to the receiver)
      */
-    protected function calculateAmount(float $amount, float $value): float
+    protected function calculate(float $amount, float $value): float
     {
         return ($amount + $value);
     }

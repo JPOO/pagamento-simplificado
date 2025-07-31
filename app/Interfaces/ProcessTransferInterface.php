@@ -13,5 +13,5 @@ interface ProcessTransferInterface
     /**
      * Execute business rules for transfer
      */
-    public function execute(int $idUser, float $value);
+    public function execute(string $cpfcnpj, float $value);
 }
