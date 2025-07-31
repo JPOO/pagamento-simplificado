@@ -9,7 +9,7 @@ Instalar dependências do composer
 composer install
 ```
 
-Configurar o banco de dados no .env,  as credenciais utiliadas são:
+Configurar o banco de dados no .env,  as credenciais utilizadas são:
 ```bash
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
@@ -43,17 +43,19 @@ Acessar aplicação pela URL local
 
 ### Validações de usuários
 
-- Cadastro de usuários de diferentes n;';iveis;
+- Cadastro de usuários de diferentes níveis;
 - Validação de usuário e unicidade por cpf-cpnj e e-mail;
 - Autenticação de usuário com validação de senha;
+- Validação de acesso interno conforme nível de acesso (Lojista não pode realizar transferência).
 
 ### Validações de transação e carteira
 
 - Verifica se usuário que realiza a transferência é tipo Comum;
-- Verifica se o usuário que recebe a trasnferência é valido (não posso enviar para mim mesmo);
-- Verifica valor minimo a ser transferido (não faz sentido enviar R$ 0,00);
+- Verifica se o usuário que recebe a transferência é valido (não posso enviar para eu mesmo, por exemplo);
+- Verifica valor mínimo a ser transferido (não faz sentido enviar R$ 0,00);
 - Verifica se usuário que realiza a transferência tem o dinheiro necessário proposto;
 - Verifica se o usuário que recebe transferência é válido;
 - Verifica se a transação está autorizada pelo serviço externo;
-- Atualiza os valores nas carteiras conforme transferência.
+- Atualiza os valores nas carteiras conforme transferência;
+- Reverte a transação em caso de erro;
 - Envia e-mail para o usuário que recebe a transferência em caso de sucesso;
