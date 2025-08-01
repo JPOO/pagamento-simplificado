@@ -10,7 +10,7 @@ use App\Http\Controllers\{
 use App\Http\Middleware\CheckUserRole;
 
 Route::get(
-    '/new-user',
+    '/',
     [UserController::class, 'create']
 );
 
